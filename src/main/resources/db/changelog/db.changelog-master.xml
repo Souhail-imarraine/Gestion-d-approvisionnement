@@ -7,5 +7,9 @@
 
     <include file="/db/changelog/001-create-fournisseurs.xml"/>
     <include file="/db/changelog/002-create-produits.xml"/>
+    <include file="/db/changelog/003-create-commandes.xml"/>
+    <include file="/db/changelog/004-create-lignes-commande.xml"/>
+    <include file="/db/changelog/005-create-lots-stock.xml"/>
+    <include file="/db/changelog/006-create-mouvements-stock.xml"/>
 
 </databaseChangeLog>
