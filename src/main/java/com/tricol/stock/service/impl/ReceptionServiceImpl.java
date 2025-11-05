@@ -29,21 +29,19 @@ public class ReceptionServiceImpl implements ReceptionService {
     @Transactional
     public CommandeDTO receptionnerCommande(Long commandeId) {
         
-        // 1. Récupérer la commande
         Commande commande = commandeRepository.findById(commandeId)
             .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + commandeId));
-        
-        // 2. Vérifier le statut
+
         if (commande.getStatut() != StatutCommande.VALIDEE) {
             throw new IllegalStateException("Seules les commandes VALIDÉES peuvent être réceptionnées. Statut actuel: " + commande.getStatut());
         }
-        
+
         // 3. Pour chaque ligne de commande
         for (LigneCommande ligne : commande.getLignes()) {
-            
+
             // 3.1 Générer un numéro de lot unique
             String numeroLot = genererNumeroLot();
-            
+
             // 3.2 Créer le lot de stock
             LotStock lot = new LotStock();
             lot.setNumeroLot(numeroLot);
@@ -71,14 +69,13 @@ public class ReceptionServiceImpl implements ReceptionService {
             produit.setStockActuel(produit.getStockActuel() + ligne.getQuantite());
             produitRepository.save(produit);
         }
-        
+
         // 4. Changer le statut de la commande à LIVREE
         commande.setStatut(StatutCommande.LIVREE);
         Commande updated = commandeRepository.save(commande);
-        
         return commandeMapper.toDTO(updated);
     }
-    
+
     private String genererNumeroLot() {
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         long count = lotStockRepository.count() + 1;

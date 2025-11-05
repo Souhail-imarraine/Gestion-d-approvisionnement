@@ -37,7 +37,7 @@ public class Commande {
     
     @Column(name = "montant_total", nullable = false, precision = 10, scale = 2)
     private BigDecimal montantTotal = BigDecimal.ZERO;
-    
+
     @ManyToOne
     @JoinColumn(name = "fournisseur_id", nullable = false)
     private Fournisseur fournisseur;
