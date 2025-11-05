@@ -8,7 +8,6 @@ import lombok.*;
 public class FournisseurDTO {
 
     private Long id;
-
     @NotBlank(message = "La raison sociale est obligatoire")
     @Size(min = 3, max = 100, message = "La raison sociale doit contenir entre 3 et 100 caractères")
     private String raisonSociale;

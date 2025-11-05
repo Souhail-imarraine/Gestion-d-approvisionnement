@@ -1,9 +1,9 @@
-package com.tricol.stock.service.impl;
+package com.tricol.stock.service;
 import com.tricol.stock.dto.FournisseurDTO;
 
 import java.util.List;
 
-public interface FournisseurImpl {
+public interface FournisseurService {
 
     FournisseurDTO create(FournisseurDTO dto);
 
@@ -14,4 +14,6 @@ public interface FournisseurImpl {
     List<FournisseurDTO> findAll();
 
     void delete(Long id);
+
+    List<FournisseurDTO> searchByName(String name);
 }

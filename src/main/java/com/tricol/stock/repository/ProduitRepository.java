@@ -16,6 +16,5 @@ public interface ProduitRepository extends JpaRepository<Produit, Long> {
     List<Produit> findByCategorie(String categorie);
 
     @Query("SELECT p FROM Produit p WHERE p.stockActuel < p.pointCommande")
-
     List<Produit> findProduitsEnAlerte();
 }

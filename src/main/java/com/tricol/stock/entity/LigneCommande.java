@@ -18,7 +18,7 @@ public class LigneCommande {
     
     @Column(name = "quantite", nullable = false)
     private Integer quantite;
-    
+
     @Column(name = "prix_unitaire", nullable = false, precision = 10, scale = 2)
     private BigDecimal prixUnitaire;
     
@@ -28,7 +28,7 @@ public class LigneCommande {
     @ManyToOne
     @JoinColumn(name = "commande_id", nullable = false)
     private Commande commande;
-    
+
     @ManyToOne
     @JoinColumn(name = "produit_id", nullable = false)
     private Produit produit;
