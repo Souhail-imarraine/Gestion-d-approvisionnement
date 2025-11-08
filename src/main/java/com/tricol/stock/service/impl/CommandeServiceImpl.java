@@ -65,17 +65,17 @@ public class CommandeServiceImpl implements CommandeService {
 
     @Override
     @Transactional
-    public CommandeDTO update(Long id, CommandeDTO dto) {
+    public CommandeDTO update(Long id, CommandeDTO commandeDTO) {
         Commande existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
 
-        Fournisseur fournisseur = fournisseurRepository.findById(dto.getFournisseurId())
-                .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + dto.getFournisseurId()));
+        Fournisseur fournisseur = fournisseurRepository.findById(commandeDTO.getFournisseurId())
+                .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + commandeDTO.getFournisseurId()));
 
-        existing.setNumero(dto.getNumero());
-        existing.setDateCommande(dto.getDateCommande());
-        existing.setDateLivraisonPrevue(dto.getDateLivraisonPrevue());
-        existing.setStatut(dto.getStatut());
+        existing.setNumero(commandeDTO.getNumero());
+        existing.setDateCommande(commandeDTO.getDateCommande());
+        existing.setDateLivraisonPrevue(commandeDTO.getDateLivraisonPrevue());
+        existing.setStatut(commandeDTO.getStatut());
         existing.setFournisseur(fournisseur);
 
         existing.getLignes().clear();
@@ -83,7 +83,7 @@ public class CommandeServiceImpl implements CommandeService {
 
         BigDecimal montantTotal = BigDecimal.ZERO;
 
-        for (LigneCommandeDTO ligneDTO : dto.getLignes()) {
+        for (LigneCommandeDTO ligneDTO : commandeDTO.getLignes()) {
             Produit produit = produitRepository.findById(ligneDTO.getProduitId())
                     .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + ligneDTO.getProduitId()));
 
