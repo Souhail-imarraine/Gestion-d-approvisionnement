@@ -33,6 +33,9 @@ public class FournisseurServiceImpl implements FournisseurService {
 
     @Override
     public FournisseurDTO create(FournisseurDTO dto) {
+        if (dto.getIce() != null && repository.existsByIce(dto.getIce())) {
+            throw new IllegalArgumentException("Un fournisseur avec l'ICE " + dto.getIce() + " existe déjà");
+        }
         Fournisseur fournisseur = FournisseurMapper.toEntity(dto);
         Fournisseur saved = repository.save(fournisseur);
         return FournisseurMapper.toDTO(saved);
