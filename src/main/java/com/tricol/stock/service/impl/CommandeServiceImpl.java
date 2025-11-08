@@ -23,7 +23,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CommandeServiceImpl implements CommandeService {
-
     private final CommandeRepository repository;
     private final FournisseurRepository fournisseurRepository;
     private final ProduitRepository produitRepository;
@@ -35,7 +34,7 @@ public class CommandeServiceImpl implements CommandeService {
         Fournisseur fournisseur = fournisseurRepository.findById(dto.getFournisseurId()).orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + dto.getFournisseurId()));
 
         Commande commande = new Commande();
-        commande.setNumero(dto.getNumero());
+        commande.setNumero(genererNumeroCommande());
         commande.setDateCommande(dto.getDateCommande());
         commande.setDateLivraisonPrevue(dto.getDateLivraisonPrevue());
         commande.setStatut(dto.getStatut());
@@ -65,17 +64,17 @@ public class CommandeServiceImpl implements CommandeService {
 
     @Override
     @Transactional
-    public CommandeDTO update(Long id, CommandeDTO dto) {
+    public CommandeDTO update(Long id, CommandeDTO commandeDTO) {
         Commande existing = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
 
-        Fournisseur fournisseur = fournisseurRepository.findById(dto.getFournisseurId())
-                .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + dto.getFournisseurId()));
+        Fournisseur fournisseur = fournisseurRepository.findById(commandeDTO.getFournisseurId())
+                .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + commandeDTO.getFournisseurId()));
 
-        existing.setNumero(dto.getNumero());
-        existing.setDateCommande(dto.getDateCommande());
-        existing.setDateLivraisonPrevue(dto.getDateLivraisonPrevue());
-        existing.setStatut(dto.getStatut());
+//        existing.setNumero(genererNumeroCommande());
+        existing.setDateCommande(commandeDTO.getDateCommande());
+        existing.setDateLivraisonPrevue(commandeDTO.getDateLivraisonPrevue());
+        existing.setStatut(commandeDTO.getStatut());
         existing.setFournisseur(fournisseur);
 
         existing.getLignes().clear();
@@ -83,7 +82,7 @@ public class CommandeServiceImpl implements CommandeService {
 
         BigDecimal montantTotal = BigDecimal.ZERO;
 
-        for (LigneCommandeDTO ligneDTO : dto.getLignes()) {
+        for (LigneCommandeDTO ligneDTO : commandeDTO.getLignes()) {
             Produit produit = produitRepository.findById(ligneDTO.getProduitId())
                     .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + ligneDTO.getProduitId()));
 
@@ -141,5 +140,9 @@ public class CommandeServiceImpl implements CommandeService {
         commande.setStatut(nouveauStatut);
         Commande updated = repository.save(commande);
         return commandeMapper.toDTO(updated);
+    }
+
+    private String genererNumeroCommande() {
+        return "CMD-" + System.currentTimeMillis();
     }
 }
