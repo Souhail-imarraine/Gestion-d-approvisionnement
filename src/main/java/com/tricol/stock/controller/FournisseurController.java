@@ -22,6 +22,11 @@ public class FournisseurController {
         return ResponseEntity.ok(service.findAll());
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<FournisseurDTO>> searchByName(@RequestParam String name){
+        return ResponseEntity.ok(service.searchByName(name));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<FournisseurDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
@@ -30,7 +35,7 @@ public class FournisseurController {
     @PostMapping
     public ResponseEntity<FournisseurDTO> create(@Valid @RequestBody FournisseurDTO dto) {
         FournisseurDTO created = service.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.ok(created);
     }
 
     @PutMapping("/{id}")
@@ -45,4 +50,5 @@ public class FournisseurController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }
