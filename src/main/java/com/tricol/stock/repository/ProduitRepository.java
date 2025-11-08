@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface ProduitRepository extends JpaRepository<Produit, Long> {
 
     Optional<Produit> findByReference(String reference);
-
+    boolean existsByreference(String reference);
     List<Produit> findByCategorie(String categorie);
 
     @Query("SELECT p FROM Produit p WHERE p.stockActuel < p.pointCommande")
