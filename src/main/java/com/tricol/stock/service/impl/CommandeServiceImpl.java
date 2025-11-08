@@ -31,19 +31,21 @@ public class CommandeServiceImpl implements CommandeService {
     @Override
     @Transactional
     public CommandeDTO create(CommandeDTO dto) {
-        Fournisseur fournisseur = fournisseurRepository.findById(dto.getFournisseurId()).orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + dto.getFournisseurId()));
+        Fournisseur fournisseur = fournisseurRepository.findById(dto.getFournisseurId())
+            .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + dto.getFournisseurId()));
 
         Commande commande = new Commande();
         commande.setNumero(genererNumeroCommande());
         commande.setDateCommande(dto.getDateCommande());
         commande.setDateLivraisonPrevue(dto.getDateLivraisonPrevue());
-        commande.setStatut(dto.getStatut());
+        commande.setStatut(dto.getStatut() != null ? dto.getStatut() : StatutCommande.EN_ATTENTE);
         commande.setFournisseur(fournisseur);
 
         BigDecimal montantTotal = BigDecimal.ZERO;
 
         for (LigneCommandeDTO ligneDTO : dto.getLignes()) {
-            Produit produit = produitRepository.findById(ligneDTO.getProduitId()).orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + ligneDTO.getProduitId()));
+            Produit produit = produitRepository.findById(ligneDTO.getProduitId())
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + ligneDTO.getProduitId()));
 
             LigneCommande ligne = new LigneCommande();
             ligne.setProduit(produit);
@@ -71,14 +73,14 @@ public class CommandeServiceImpl implements CommandeService {
         Fournisseur fournisseur = fournisseurRepository.findById(commandeDTO.getFournisseurId())
                 .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + commandeDTO.getFournisseurId()));
 
-//        existing.setNumero(genererNumeroCommande());
         existing.setDateCommande(commandeDTO.getDateCommande());
         existing.setDateLivraisonPrevue(commandeDTO.getDateLivraisonPrevue());
-        existing.setStatut(commandeDTO.getStatut());
+        if (commandeDTO.getStatut() != null) {
+            existing.setStatut(commandeDTO.getStatut());
+        }
         existing.setFournisseur(fournisseur);
 
         existing.getLignes().clear();
-
 
         BigDecimal montantTotal = BigDecimal.ZERO;
 
@@ -136,7 +138,8 @@ public class CommandeServiceImpl implements CommandeService {
     @Override
     @Transactional
     public CommandeDTO changerStatut(Long id, StatutCommande nouveauStatut) {
-        Commande commande = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
+        Commande commande = repository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
         commande.setStatut(nouveauStatut);
         Commande updated = repository.save(commande);
         return commandeMapper.toDTO(updated);

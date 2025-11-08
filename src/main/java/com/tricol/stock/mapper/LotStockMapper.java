@@ -20,4 +20,6 @@ public interface LotStockMapper {
     @Mapping(source = "commandeId", target = "commande.id")
     @Mapping(target = "commande.numero", ignore = true)
     LotStock toEntity(LotStockDTO dto);
+    
+    List<LotStockDTO> toDTOList(List<LotStock> entities);
 }

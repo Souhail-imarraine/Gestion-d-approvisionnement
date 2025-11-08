@@ -17,4 +17,6 @@ public interface MouvementStockRepository extends JpaRepository<MouvementStock, 
     List<MouvementStock> findByTypeMouvement(TypeMouvement type);
     
     List<MouvementStock> findByProduitIdOrderByDateMouvementDesc(Long produitId);
+    
+    List<MouvementStock> findAllByOrderByDateMouvementDesc();
 }
