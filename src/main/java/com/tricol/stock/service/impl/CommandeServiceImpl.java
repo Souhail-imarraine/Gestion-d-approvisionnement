@@ -27,13 +27,12 @@ public class CommandeServiceImpl implements CommandeService {
     private final CommandeRepository repository;
     private final FournisseurRepository fournisseurRepository;
     private final ProduitRepository produitRepository;
-    private final CommandeMapper mapper;
+    private final CommandeMapper commandeMapper;
 
     @Override
     @Transactional
     public CommandeDTO create(CommandeDTO dto) {
-        Fournisseur fournisseur = fournisseurRepository.findById(dto.getFournisseurId())
-                .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + dto.getFournisseurId()));
+        Fournisseur fournisseur = fournisseurRepository.findById(dto.getFournisseurId()).orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + dto.getFournisseurId()));
 
         Commande commande = new Commande();
         commande.setNumero(dto.getNumero());
@@ -45,8 +44,7 @@ public class CommandeServiceImpl implements CommandeService {
         BigDecimal montantTotal = BigDecimal.ZERO;
 
         for (LigneCommandeDTO ligneDTO : dto.getLignes()) {
-            Produit produit = produitRepository.findById(ligneDTO.getProduitId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + ligneDTO.getProduitId()));
+            Produit produit = produitRepository.findById(ligneDTO.getProduitId()).orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + ligneDTO.getProduitId()));
 
             LigneCommande ligne = new LigneCommande();
             ligne.setProduit(produit);
@@ -62,7 +60,7 @@ public class CommandeServiceImpl implements CommandeService {
         commande.setMontantTotal(montantTotal);
 
         Commande saved = repository.save(commande);
-        return mapper.toDTO(saved);
+        return commandeMapper.toDTO(saved);
     }
 
     @Override
@@ -103,19 +101,19 @@ public class CommandeServiceImpl implements CommandeService {
         existing.setMontantTotal(montantTotal);
 
         Commande updated = repository.save(existing);
-        return mapper.toDTO(updated);
+        return commandeMapper.toDTO(updated);
     }
 
     @Override
     public CommandeDTO findById(Long id) {
         Commande commande = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
-        return mapper.toDTO(commande);
+        return commandeMapper.toDTO(commande);
     }
 
     @Override
     public List<CommandeDTO> findAll() {
-        return mapper.toDTOList(repository.findAll());
+        return commandeMapper.toDTOList(repository.findAll());
     }
 
     @Override
@@ -128,12 +126,12 @@ public class CommandeServiceImpl implements CommandeService {
 
     @Override
     public List<CommandeDTO> findByStatut(StatutCommande statut) {
-        return mapper.toDTOList(repository.findByStatut(statut));
+        return commandeMapper.toDTOList(repository.findByStatut(statut));
     }
 
     @Override
     public List<CommandeDTO> findByFournisseur(Long fournisseurId) {
-        return mapper.toDTOList(repository.findByFournisseurId(fournisseurId));
+        return commandeMapper.toDTOList(repository.findByFournisseurId(fournisseurId));
     }
 
     @Override
@@ -142,6 +140,6 @@ public class CommandeServiceImpl implements CommandeService {
         Commande commande = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
         commande.setStatut(nouveauStatut);
         Commande updated = repository.save(commande);
-        return mapper.toDTO(updated);
+        return commandeMapper.toDTO(updated);
     }
 }

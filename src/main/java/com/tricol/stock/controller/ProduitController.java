@@ -1,7 +1,6 @@
 package com.tricol.stock.controller;
 
 import com.tricol.stock.dto.ProduitDTO;
-import com.tricol.stock.service.ProduitService;
 import com.tricol.stock.service.impl.ProduitServiceImp;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

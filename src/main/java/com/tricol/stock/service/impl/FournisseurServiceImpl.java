@@ -1,42 +1,46 @@
-package com.tricol.stock.service;
+package com.tricol.stock.service.impl;
 
 import com.tricol.stock.dto.FournisseurDTO;
 import com.tricol.stock.entity.Fournisseur;
 import com.tricol.stock.exception.ResourceNotFoundException;
 import com.tricol.stock.mapper.FournisseurMapper;
 import com.tricol.stock.repository.FournisseurRepository;
-import com.tricol.stock.service.impl.FournisseurImpl;
+import com.tricol.stock.service.FournisseurService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FournisseurService implements FournisseurImpl {
+@Primary
+public class FournisseurServiceImpl implements FournisseurService {
 
     private final FournisseurRepository repository;
-    private final FournisseurMapper mapper;
+    private final FournisseurMapper FournisseurMapper;
 
+    @Override
     public List<FournisseurDTO> findAll() {
-        return mapper.toDTOList(repository.findAll());
+        return FournisseurMapper.toDTOList(repository.findAll());
     }
 
+    @Override
     public FournisseurDTO findById(Long id) {
-        Fournisseur fournisseur = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + id));
-        return mapper.toDTO(fournisseur);
+        Fournisseur fournisseur = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + id));
+        return FournisseurMapper.toDTO(fournisseur);
     }
 
+    @Override
     public FournisseurDTO create(FournisseurDTO dto) {
-        Fournisseur fournisseur = mapper.toEntity(dto);
+        Fournisseur fournisseur = FournisseurMapper.toEntity(dto);
         Fournisseur saved = repository.save(fournisseur);
-        return mapper.toDTO(saved);
+        return FournisseurMapper.toDTO(saved);
     }
 
+    @Override
     public FournisseurDTO update(Long id, FournisseurDTO dto) {
-        Fournisseur existing = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + id));
+        Fournisseur existing = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + id));
 
         existing.setRaisonSociale(dto.getRaisonSociale());
         existing.setAdresse(dto.getAdresse());
@@ -47,13 +51,20 @@ public class FournisseurService implements FournisseurImpl {
         existing.setIce(dto.getIce());
 
         Fournisseur updated = repository.save(existing);
-        return mapper.toDTO(updated);
+        return FournisseurMapper.toDTO(updated);
     }
 
+    @Override
     public void delete(Long id) {
         if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + id);
         }
         repository.deleteById(id);
+    }
+
+    @Override
+    public List<FournisseurDTO> searchByName(String name){
+        List<Fournisseur> fournisseurs = repository.findByRaisonSocialeContainingIgnoreCase(name);
+        return FournisseurMapper.toDTOList(fournisseurs);
     }
 }

@@ -13,4 +13,5 @@ public interface FournisseurRepository extends JpaRepository<Fournisseur, Long> 
     Optional<Fournisseur> findByIce(String ice);
 
     List<Fournisseur> findByVille(String ville);
+    List<Fournisseur> findByRaisonSocialeContainingIgnoreCase(String nom);
 }
