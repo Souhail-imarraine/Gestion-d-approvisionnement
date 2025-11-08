@@ -48,6 +48,13 @@ public class FournisseurServiceImpl implements FournisseurService {
     public FournisseurDTO update(Long id, FournisseurDTO dto) {
         Fournisseur existing = repositoryFournisseur.findById(id).orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + id));
 
+        if(dto.getEmail() != null && repositoryFournisseur.existsByEmail(dto.getEmail())){
+            throw new IllegalArgumentException("l'email" + dto.getEmail() + " existe déjà ");
+        }
+        if (dto.getIce() != null && repositoryFournisseur.existsByIce(dto.getIce())) {
+            throw new IllegalArgumentException("Un fournisseur avec l'ICE " + dto.getIce() + " existe déjà");
+        }
+
         existing.setRaisonSociale(dto.getRaisonSociale());
         existing.setAdresse(dto.getAdresse());
         existing.setVille(dto.getVille());

@@ -2,6 +2,7 @@ package com.tricol.stock.service.impl;
 
 import com.tricol.stock.dto.ProduitDTO;
 import com.tricol.stock.entity.Produit;
+import com.tricol.stock.exception.DuplicateReferenceException;
 import com.tricol.stock.exception.ResourceNotFoundException;
 import com.tricol.stock.mapper.ProduitMapper;
 import com.tricol.stock.repository.ProduitRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 @Service
@@ -30,6 +32,9 @@ public class ProduitServiceImp implements ProduitService {
     }
 
     public ProduitDTO create(ProduitDTO dto) {
+        if(dto.getReference() != null && repository.existsByreference(dto.getReference())){
+            throw new DuplicateReferenceException("La référence" +dto.getReference()+" existe déjà");
+        }
         Produit produit = ProduitMapper.toEntity(dto);
         Produit saved = repository.save(produit);
         return ProduitMapper.toDTO(saved);
