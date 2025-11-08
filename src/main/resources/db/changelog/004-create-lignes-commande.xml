@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="1" author="souhail">
+        <createTable tableName="lignes_commande">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="quantite" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="prix_unitaire" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sous_total" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="commande_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="produit_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="lignes_commande"
+                baseColumnNames="commande_id"
+                constraintName="fk_lignes_commande_commande"
+                referencedTableName="commandes"
+                referencedColumnNames="id"
+                onDelete="CASCADE"
+                onUpdate="CASCADE"/>
+
+        <addForeignKeyConstraint
+                baseTableName="lignes_commande"
+                baseColumnNames="produit_id"
+                constraintName="fk_lignes_commande_produit"
+                referencedTableName="produits"
+                referencedColumnNames="id"
+                onDelete="RESTRICT"
+                onUpdate="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
