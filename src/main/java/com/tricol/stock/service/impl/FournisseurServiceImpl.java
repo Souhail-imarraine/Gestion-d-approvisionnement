@@ -81,7 +81,3 @@ public class FournisseurServiceImpl implements FournisseurService {
         return FournisseurMapper.toDTOList(fournisseurs);
     }
 }
-<<<<<<< HEAD
->>>>>>> 59833a1 (add validation fourniseur)
-=======
->>>>>>> 8f6ef47 (serviceImpl Fournisseur && Commande)

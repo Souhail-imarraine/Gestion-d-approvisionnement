@@ -1,9 +1,11 @@
 package com.tricol.stock.service.impl;
 
 import com.tricol.stock.dto.BonSortieDTO;
+import com.tricol.stock.dto.LigneBonSortieDTO;
 import com.tricol.stock.entity.BonSortie;
 import com.tricol.stock.entity.LigneBonSortie;
 import com.tricol.stock.entity.MouvementStock;
+import com.tricol.stock.entity.Produit;
 import com.tricol.stock.enums.StatutBonSortie;
 import com.tricol.stock.exception.ResourceNotFoundException;
 import com.tricol.stock.mapper.BonSortieMapper;
@@ -46,10 +48,24 @@ public class BonSortieServiceImpl implements BonSortieService {
     @Override
     @Transactional
     public BonSortieDTO create(BonSortieDTO dto) {
-        BonSortie bonSortie = bonSortieMapper.toEntity(dto);
+        BonSortie bonSortie = new BonSortie();
         bonSortie.setNumero(genererNumero());
         bonSortie.setDateCreation(LocalDateTime.now());
         bonSortie.setStatut(StatutBonSortie.BROUILLON);
+        bonSortie.setAtelier(dto.getAtelier());
+        bonSortie.setCommentaire(dto.getCommentaire());
+        
+        for (LigneBonSortieDTO ligneDTO : dto.getLignes()) {
+            Produit produit = produitRepository.findById(ligneDTO.getProduitId())
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé: " + ligneDTO.getProduitId()));
+            
+            LigneBonSortie ligne = new LigneBonSortie();
+            ligne.setProduit(produit);
+            ligne.setQuantite(ligneDTO.getQuantite());
+            ligne.setBonSortie(bonSortie);
+            
+            bonSortie.getLignes().add(ligne);
+        }
         
         BonSortie saved = bonSortieRepository.save(bonSortie);
         return bonSortieMapper.toDTO(saved);
@@ -67,6 +83,19 @@ public class BonSortieServiceImpl implements BonSortieService {
         
         existing.setAtelier(dto.getAtelier());
         existing.setCommentaire(dto.getCommentaire());
+        existing.getLignes().clear();
+        
+        for (LigneBonSortieDTO ligneDTO : dto.getLignes()) {
+            Produit produit = produitRepository.findById(ligneDTO.getProduitId())
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé: " + ligneDTO.getProduitId()));
+            
+            LigneBonSortie ligne = new LigneBonSortie();
+            ligne.setProduit(produit);
+            ligne.setQuantite(ligneDTO.getQuantite());
+            ligne.setBonSortie(existing);
+            
+            existing.getLignes().add(ligne);
+        }
         
         BonSortie updated = bonSortieRepository.save(existing);
         return bonSortieMapper.toDTO(updated);

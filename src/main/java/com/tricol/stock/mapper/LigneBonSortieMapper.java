@@ -15,7 +15,8 @@ public interface LigneBonSortieMapper {
     @Mapping(source = "produit.reference", target = "produitReference")
     LigneBonSortieDTO toDTO(LigneBonSortie entity);
     
-    @Mapping(source = "produitId", target = "produit.id")
+    @Mapping(target = "produit", ignore = true)
+    @Mapping(target = "bonSortie", ignore = true)
     LigneBonSortie toEntity(LigneBonSortieDTO dto);
     
     List<LigneBonSortieDTO> toDTOList(List<LigneBonSortie> entities);
