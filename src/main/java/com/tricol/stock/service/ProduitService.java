@@ -1,7 +1,7 @@
 package com.tricol.stock.service;
 
 import com.tricol.stock.dto.ProduitDTO;
-
+import com.tricol.stock.dto.StockDTO;
 
 import java.util.List;
 
@@ -12,4 +12,5 @@ public interface  ProduitService {
     List<ProduitDTO> findAll();
     void delete(Long id);
     List<ProduitDTO> findProduitsEnAlerte();
+    StockDTO getStock(Long id);
 }
