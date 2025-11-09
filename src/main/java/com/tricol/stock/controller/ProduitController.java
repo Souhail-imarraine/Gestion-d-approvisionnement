@@ -1,5 +1,6 @@
 package com.tricol.stock.controller;
 
+import com.tricol.stock.dto.StockDTO;
 import com.tricol.stock.dto.ProduitDTO;
 import com.tricol.stock.service.impl.ProduitServiceImp;
 import jakarta.validation.Valid;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -39,13 +41,20 @@ public class ProduitController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<HashMap<String, String>> delete(@PathVariable Long id) {
         service.delete(id);
-        return ResponseEntity.noContent().build();
+        HashMap<String, String> message = new HashMap<>();
+        message.put("message", "Produit supprime avec succes");
+        return ResponseEntity.ok(message);
     }
 
     @GetMapping("/alertes")
     public ResponseEntity<List<ProduitDTO>> getProduitsEnAlerte() {
         return ResponseEntity.ok(service.findProduitsEnAlerte());
+    }
+
+    @GetMapping("/{id}/stock")
+    public ResponseEntity<StockDTO> getStock(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getStock(id));
     }
 }
