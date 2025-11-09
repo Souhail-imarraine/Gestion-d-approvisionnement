@@ -12,13 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommandeDTO {
-    
     private Long id;
-    
-    @NotBlank(message = "Le numéro de commande est obligatoire")
-    @Size(max = 50, message = "Le numéro ne peut pas dépasser 50 caractères")
+
     private String numero;
-    
+
     @NotNull(message = "La date de commande est obligatoire")
     private LocalDate dateCommande;
     
