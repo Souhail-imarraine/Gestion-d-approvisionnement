@@ -8,8 +8,6 @@ import java.util.List;
 
 @Repository
 public interface LigneCommandeRepository extends JpaRepository<LigneCommande, Long> {
-    
     List<LigneCommande> findByCommandeId(Long commandeId);
-    
     List<LigneCommande> findByProduitId(Long produitId);
 }
