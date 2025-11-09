@@ -1,5 +1,6 @@
 package com.tricol.stock.controller;
 
+import com.tricol.stock.dto.StockDTO;
 import com.tricol.stock.dto.ProduitDTO;
 import com.tricol.stock.service.impl.ProduitServiceImp;
 import jakarta.validation.Valid;
@@ -50,5 +51,10 @@ public class ProduitController {
     @GetMapping("/alertes")
     public ResponseEntity<List<ProduitDTO>> getProduitsEnAlerte() {
         return ResponseEntity.ok(service.findProduitsEnAlerte());
+    }
+
+    @GetMapping("/{id}/stock")
+    public ResponseEntity<StockDTO> getStock(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getStock(id));
     }
 }
