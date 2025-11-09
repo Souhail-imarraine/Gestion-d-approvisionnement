@@ -11,5 +11,6 @@
     <include file="/db/changelog/004-create-lignes-commande.xml"/>
     <include file="/db/changelog/005-create-lots-stock.xml"/>
     <include file="/db/changelog/006-create-mouvements-stock.xml"/>
+    <include file="/db/changelog/007-create-bons-sortie.xml"/>
 
 </databaseChangeLog>

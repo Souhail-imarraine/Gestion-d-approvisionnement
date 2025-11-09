@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="1" author="system">
+        <createTable tableName="bons_sortie">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="numero" type="VARCHAR(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="date_creation" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_validation" type="DATETIME"/>
+            <column name="statut" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="atelier" type="VARCHAR(100)"/>
+            <column name="commentaire" type="TEXT"/>
+        </createTable>
+
+        <createTable tableName="lignes_bon_sortie">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="quantite" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bon_sortie_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="produit_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="lignes_bon_sortie"
+            baseColumnNames="bon_sortie_id"
+            constraintName="fk_ligne_bon_sortie"
+            referencedTableName="bons_sortie"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="lignes_bon_sortie"
+            baseColumnNames="produit_id"
+            constraintName="fk_ligne_produit"
+            referencedTableName="produits"
+            referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>
