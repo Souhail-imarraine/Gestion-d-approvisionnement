@@ -1,6 +1,7 @@
 package com.tricol.stock.service.impl;
 
 import com.tricol.stock.dto.ProduitDTO;
+import com.tricol.stock.dto.StockDTO;
 import com.tricol.stock.entity.Produit;
 import com.tricol.stock.exception.DuplicateReferenceException;
 import com.tricol.stock.exception.ResourceNotFoundException;
@@ -26,12 +27,14 @@ public class ProduitServiceImp implements ProduitService {
         return produitMapper.toDTOList(produitRepository.findAll());
     }
 
+    @Override
     public ProduitDTO findById(Long id) {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + id));
         return produitMapper.toDTO(produit);
     }
 
+    @Override
     public ProduitDTO create(ProduitDTO dto) {
         if(dto.getReference() != null && produitRepository.existsByreference(dto.getReference())){
             throw new DuplicateReferenceException("La référence" +dto.getReference()+" existe déjà");
@@ -41,6 +44,7 @@ public class ProduitServiceImp implements ProduitService {
         return produitMapper.toDTO(saved);
     }
 
+    @Override
     public ProduitDTO update(Long id, ProduitDTO dto) {
         Produit existing = produitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + id));
@@ -58,6 +62,7 @@ public class ProduitServiceImp implements ProduitService {
         return produitMapper.toDTO(updated);
     }
 
+    @Override
     public void delete(Long id) {
         if (!produitRepository.existsById(id)) {
             throw new ResourceNotFoundException("Produit non trouvé avec l'ID: " + id);
@@ -66,6 +71,23 @@ public class ProduitServiceImp implements ProduitService {
             throw new IllegalArgumentException("Vous ne pouvez pas supprimer un produit qui existe dans une commande");
         }
         produitRepository.deleteById(id);
+    }
+
+    @Override
+    public StockDTO getStock(Long id) {
+        Produit produit = produitRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + id));
+
+        boolean enAlerte = produit.getStockActuel() <= produit.getPointCommande();
+
+        return new StockDTO(
+                produit.getId(),
+                produit.getNom(),
+                produit.getStockActuel(),
+                produit.getPointCommande(),
+                produit.getUniteMesure(),
+                enAlerte
+        );
     }
 
     public List<ProduitDTO> findProduitsEnAlerte() {
