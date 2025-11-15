@@ -1,9 +1,9 @@
-package com.tricol.stock.dto;
+package com.tricol.stock.dto.response;
 
 import lombok.Data;
 
 @Data
-public class LigneBonSortieDTO {
+public class LigneBonSortieResponseDTO {
     private Long id;
     private Integer quantite;
     private Long produitId;

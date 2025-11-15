@@ -1,12 +1,15 @@
 package com.tricol.stock.controller;
 
-import com.tricol.stock.dto.CommandeDTO;
+import com.tricol.stock.dto.request.CommandeCreateRequest;
+import com.tricol.stock.dto.request.CommandeUpdateRequest;
+import com.tricol.stock.dto.response.CommandeResponseDTO;
 import com.tricol.stock.enums.StatutCommande;
 import com.tricol.stock.service.CommandeService;
 import com.tricol.stock.service.ReceptionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,23 +24,23 @@ public class CommandeController {
     private final ReceptionService receptionService;
     
     @GetMapping
-    public ResponseEntity<List<CommandeDTO>> getAll() {
+    public ResponseEntity<List<CommandeResponseDTO>> getAll() {
         return ResponseEntity.ok(service.findAll());
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<CommandeDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<CommandeResponseDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
     
     @PostMapping
-    public ResponseEntity<CommandeDTO> create(@Valid @RequestBody CommandeDTO dto) {
-        CommandeDTO created = service.create(dto);
+    public ResponseEntity<CommandeResponseDTO> create(@Valid @RequestBody CommandeCreateRequest dto) {
+        CommandeResponseDTO created = service.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<CommandeDTO> update(@PathVariable Long id, @Valid @RequestBody CommandeDTO dto) {
+    public ResponseEntity<CommandeResponseDTO> update(@PathVariable Long id, @Valid @RequestBody CommandeUpdateRequest dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
     
@@ -46,24 +49,24 @@ public class CommandeController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
-    
+
     @GetMapping("/statut/{statut}")
-    public ResponseEntity<List<CommandeDTO>> getByStatut(@PathVariable StatutCommande statut) {
+    public ResponseEntity<List<CommandeResponseDTO>> getByStatut(@PathVariable StatutCommande statut) {
         return ResponseEntity.ok(service.findByStatut(statut));
     }
-    
+
     @GetMapping("/fournisseur/{fournisseurId}")
-    public ResponseEntity<List<CommandeDTO>> getByFournisseur(@PathVariable Long fournisseurId) {
+    public ResponseEntity<List<CommandeResponseDTO>> getByFournisseur(@PathVariable Long fournisseurId) {
         return ResponseEntity.ok(service.findByFournisseur(fournisseurId));
     }
-    
+
     @PatchMapping("/{id}/statut")
-    public ResponseEntity<CommandeDTO> changerStatut(@PathVariable Long id, @RequestParam StatutCommande statut) {
+    public ResponseEntity<CommandeResponseDTO> changerStatut(@PathVariable Long id, @RequestParam String statut) {
         return ResponseEntity.ok(service.changerStatut(id, statut));
     }
-    
+
     @PutMapping("/{id}/reception")
-    public ResponseEntity<CommandeDTO> receptionner(@PathVariable Long id) {
+    public ResponseEntity<CommandeResponseDTO> receptionner(@PathVariable Long id) {
         return ResponseEntity.ok(receptionService.receptionnerCommande(id));
     }
 }

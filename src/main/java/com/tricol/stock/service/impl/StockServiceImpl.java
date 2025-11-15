@@ -1,6 +1,6 @@
 package com.tricol.stock.service.impl;
 
-import com.tricol.stock.dto.*;
+import com.tricol.stock.dto.response.*;
 import com.tricol.stock.entity.LotStock;
 import com.tricol.stock.entity.MouvementStock;
 import com.tricol.stock.entity.Produit;
@@ -31,7 +31,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public List<EtatStockDTO> getEtatGlobalStock() {
         List<Produit> produits = produitRepository.findAll();
-        
+
         return produits.stream().map(produit -> {
             BigDecimal valeurStock = calculerValeurStockProduit(produit.getId());
             boolean enAlerte = produit.getStockActuel() <= produit.getPointCommande();
@@ -81,7 +81,7 @@ public class StockServiceImpl implements StockService {
         List<MouvementStock> mouvements = mouvementStockRepository.findByProduitIdOrderByDateMouvementDesc(produitId);
         return mouvementStockMapper.toDTOList(mouvements);
     }
-    
+
     @Override
     public List<EtatStockDTO> getProduitsEnAlerte() {
         List<Produit> produits = produitRepository.findProduitsEnAlerte();
@@ -100,24 +100,27 @@ public class StockServiceImpl implements StockService {
             );
         }).collect(Collectors.toList());
     }
-    
+
     @Override
     public ValorisationStockDTO getValorisationStock() {
         List<LotStock> lots = lotStockRepository.findAll();
-        
-        BigDecimal valeurTotale = lots.stream()
-            .map(lot -> lot.getPrixUnitaire().multiply(BigDecimal.valueOf(lot.getQuantiteRestante())))
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
-        Integer quantiteTotale = lots.stream()
-            .mapToInt(LotStock::getQuantiteRestante)
-            .sum();
-        
-        long nombreProduits = produitRepository.count();
-        
-        return new ValorisationStockDTO(valeurTotale, (int) nombreProduits, quantiteTotale);
+
+        BigDecimal valeurTotale = BigDecimal.ZERO;
+        int quantiteTotale = 0;
+
+        for (LotStock lot : lots) {
+            BigDecimal valeurLot = lot.getPrixUnitaire()
+                    .multiply(BigDecimal.valueOf(lot.getQuantiteRestante()));
+            valeurTotale = valeurTotale.add(valeurLot);
+            quantiteTotale += lot.getQuantiteRestante();
+        }
+
+        int nombreProduits = (int) produitRepository.count();
+
+        return new ValorisationStockDTO(valeurTotale, nombreProduits, quantiteTotale);
     }
-    
+
+
     private BigDecimal calculerValeurStockProduit(Long produitId) {
         List<LotStock> lots = lotStockRepository
             .findByProduitIdAndQuantiteRestanteGreaterThanOrderByDateEntreeAsc(produitId, 0);

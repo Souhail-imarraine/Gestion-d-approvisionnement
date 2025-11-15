@@ -12,7 +12,6 @@ public interface LotStockRepository extends JpaRepository<LotStock, Long> {
     List<LotStock> findByProduitId(Long produitId);
     
     List<LotStock> findByCommandeId(Long commandeId);
-    
-    // Pour FIFO : récupérer les lots les plus anciens en premier
+
     List<LotStock> findByProduitIdAndQuantiteRestanteGreaterThanOrderByDateEntreeAsc(Long produitId, Integer quantite);
 }

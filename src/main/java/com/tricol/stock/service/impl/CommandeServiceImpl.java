@@ -1,7 +1,9 @@
 package com.tricol.stock.service.impl;
 
-import com.tricol.stock.dto.CommandeDTO;
-import com.tricol.stock.dto.LigneCommandeDTO;
+import com.tricol.stock.dto.request.CommandeCreateRequest;
+import com.tricol.stock.dto.request.CommandeUpdateRequest;
+import com.tricol.stock.dto.request.LigneCommandeCreateRequest;
+import com.tricol.stock.dto.response.CommandeResponseDTO;
 import com.tricol.stock.entity.Commande;
 import com.tricol.stock.entity.Fournisseur;
 import com.tricol.stock.entity.LigneCommande;
@@ -18,132 +20,184 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
 public class CommandeServiceImpl implements CommandeService {
-    private final CommandeRepository repository;
+    private final CommandeRepository repositoryCommande;
     private final FournisseurRepository fournisseurRepository;
     private final ProduitRepository produitRepository;
     private final CommandeMapper commandeMapper;
 
     @Override
     @Transactional
-    public CommandeDTO create(CommandeDTO dto) {
+    public CommandeResponseDTO create(CommandeCreateRequest dto) {
         Fournisseur fournisseur = fournisseurRepository.findById(dto.getFournisseurId())
             .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + dto.getFournisseurId()));
 
         Commande commande = new Commande();
         commande.setNumero(genererNumeroCommande());
-        commande.setDateCommande(dto.getDateCommande());
+        commande.setDateCommande(LocalDate.now());
         commande.setDateLivraisonPrevue(dto.getDateLivraisonPrevue());
-        commande.setStatut(dto.getStatut() != null ? dto.getStatut() : StatutCommande.EN_ATTENTE);
+        commande.setStatut(StatutCommande.EN_ATTENTE);
         commande.setFournisseur(fournisseur);
+        commande.setLignes(new ArrayList<>());
 
         BigDecimal montantTotal = BigDecimal.ZERO;
 
-        for (LigneCommandeDTO ligneDTO : dto.getLignes()) {
+        for (LigneCommandeCreateRequest ligneDTO : dto.getLignes()) {
             Produit produit = produitRepository.findById(ligneDTO.getProduitId())
                 .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + ligneDTO.getProduitId()));
 
-            LigneCommande ligne = new LigneCommande();
-            ligne.setProduit(produit);
-            ligne.setQuantite(ligneDTO.getQuantite());
-            ligne.setPrixUnitaire(ligneDTO.getPrixUnitaire());
-            ligne.setSousTotal(ligneDTO.getPrixUnitaire().multiply(BigDecimal.valueOf(ligneDTO.getQuantite())));
-
-            ligne.setCommande(commande);
-
-            commande.getLignes().add(ligne);
-            montantTotal = montantTotal.add(ligne.getSousTotal());
+            LigneCommande ligneCommande = LigneCommande
+                    .builder()
+                    .produit(produit)
+                    .quantite(ligneDTO.getQuantite())
+                    .prixUnitaire(ligneDTO.getPrixUnitaire())
+                    .sousTotal(ligneDTO.getPrixUnitaire().multiply(BigDecimal.valueOf(ligneDTO.getQuantite())))
+                    .commande(commande)
+                    .build();
+            commande.getLignes().add(ligneCommande);
+            montantTotal = montantTotal.add(ligneCommande.getSousTotal());
         }
         commande.setMontantTotal(montantTotal);
 
-        Commande saved = repository.save(commande);
+        Commande saved = repositoryCommande.save(commande);
         return commandeMapper.toDTO(saved);
     }
 
     @Override
     @Transactional
-    public CommandeDTO update(Long id, CommandeDTO commandeDTO) {
-        Commande existing = repository.findById(id)
+    public CommandeResponseDTO update(Long id, CommandeUpdateRequest commandeDTO) {
+        Commande existingCommande = repositoryCommande.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
 
-        Fournisseur fournisseur = fournisseurRepository.findById(commandeDTO.getFournisseurId())
-                .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + commandeDTO.getFournisseurId()));
-
-        existing.setDateCommande(commandeDTO.getDateCommande());
-        existing.setDateLivraisonPrevue(commandeDTO.getDateLivraisonPrevue());
-        if (commandeDTO.getStatut() != null) {
-            existing.setStatut(commandeDTO.getStatut());
-        }
-        existing.setFournisseur(fournisseur);
-
-        existing.getLignes().clear();
-
-        BigDecimal montantTotal = BigDecimal.ZERO;
-
-        for (LigneCommandeDTO ligneDTO : commandeDTO.getLignes()) {
-            Produit produit = produitRepository.findById(ligneDTO.getProduitId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + ligneDTO.getProduitId()));
-
-            LigneCommande ligne = new LigneCommande();
-            ligne.setProduit(produit);
-            ligne.setQuantite(ligneDTO.getQuantite());
-            ligne.setPrixUnitaire(ligneDTO.getPrixUnitaire());
-            ligne.setSousTotal(ligneDTO.getPrixUnitaire().multiply(BigDecimal.valueOf(ligneDTO.getQuantite())));
-            ligne.setCommande(existing);
-
-            existing.getLignes().add(ligne);
-            montantTotal = montantTotal.add(ligne.getSousTotal());
+        if (commandeDTO.getFournisseurId() != null){
+            Fournisseur fournisseur = fournisseurRepository.findById(commandeDTO.getFournisseurId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + commandeDTO.getFournisseurId()));
+            existingCommande.setFournisseur(fournisseur);
         }
 
-        existing.setMontantTotal(montantTotal);
+        if (commandeDTO.getDateLivraisonPrevue() != null){
+            existingCommande.setDateLivraisonPrevue(commandeDTO.getDateLivraisonPrevue());
+        }
 
-        Commande updated = repository.save(existing);
+
+        if (commandeDTO.getLignes() != null && !commandeDTO.getLignes().isEmpty()){
+            existingCommande.getLignes().clear();
+
+            BigDecimal montantTotal = BigDecimal.ZERO;
+
+            for (LigneCommandeCreateRequest ligneDTO : commandeDTO.getLignes()) {
+                Produit produit = produitRepository.findById(ligneDTO.getProduitId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + ligneDTO.getProduitId()));
+
+                LigneCommande ligne = LigneCommande
+                        .builder()
+                        .produit(produit)
+                        .quantite(ligneDTO.getQuantite())
+                        .prixUnitaire(ligneDTO.getPrixUnitaire())
+                        .sousTotal(ligneDTO.getPrixUnitaire().multiply(BigDecimal.valueOf(ligneDTO.getQuantite())))
+                        .commande(existingCommande)
+                        .build();
+
+                existingCommande.getLignes().add(ligne);
+                montantTotal = montantTotal.add(ligne.getSousTotal());
+            }
+
+            existingCommande.setMontantTotal(montantTotal);
+        }
+
+        Commande updated = repositoryCommande.save(existingCommande);
         return commandeMapper.toDTO(updated);
     }
 
     @Override
-    public CommandeDTO findById(Long id) {
-        Commande commande = repository.findById(id)
+    public CommandeResponseDTO findById(Long id) {
+        Commande commande = repositoryCommande.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
         return commandeMapper.toDTO(commande);
     }
 
     @Override
-    public List<CommandeDTO> findAll() {
-        return commandeMapper.toDTOList(repository.findAll());
+    public List<CommandeResponseDTO> findAll() {
+        return commandeMapper.toDTOList(repositoryCommande.findAll());
     }
 
     @Override
     public void delete(Long id) {
-        if (!repository.existsById(id)) {
+        if (!repositoryCommande.existsById(id)) {
             throw new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id);
         }
-        repository.deleteById(id);
+        repositoryCommande.deleteById(id);
     }
 
     @Override
-    public List<CommandeDTO> findByStatut(StatutCommande statut) {
-        return commandeMapper.toDTOList(repository.findByStatut(statut));
+    public List<CommandeResponseDTO> findByStatut(StatutCommande statut) {
+        return commandeMapper.toDTOList(repositoryCommande.findByStatut(statut));
     }
 
     @Override
-    public List<CommandeDTO> findByFournisseur(Long fournisseurId) {
-        return commandeMapper.toDTOList(repository.findByFournisseurId(fournisseurId));
+    public List<CommandeResponseDTO> findByFournisseur(Long fournisseurId) {
+        if (!fournisseurRepository.existsById(fournisseurId)) {
+            throw new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + fournisseurId);
+        }
+        return commandeMapper.toDTOList(repositoryCommande.findByFournisseurId(fournisseurId));
     }
 
     @Override
     @Transactional
-    public CommandeDTO changerStatut(Long id, StatutCommande nouveauStatut) {
-        Commande commande = repository.findById(id)
+    public CommandeResponseDTO changerStatut(Long id, String nouveauStatut) {
+        Commande commande = repositoryCommande.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
-        commande.setStatut(nouveauStatut);
-        Commande updated = repository.save(commande);
-        return commandeMapper.toDTO(updated);
+
+        try {
+            StatutCommande newStatus = StatutCommande.valueOf(nouveauStatut.toUpperCase());
+
+            if (commande.getStatut() == StatutCommande.LIVREE) {
+                throw new IllegalStateException("Une commande livrée ne peut plus changer de statut");
+            }
+
+            if (commande.getStatut() == StatutCommande.EN_ATTENTE && newStatus == StatutCommande.LIVREE) {
+                throw new IllegalStateException("Une commande doit être VALIDEE avant d'être LIVREE");
+            }
+
+            commande.setStatut(newStatus);
+            Commande updated = repositoryCommande.save(commande);
+            return commandeMapper.toDTO(updated);
+
+        }catch (IllegalArgumentException  e){
+            throw new IllegalStateException("Statut invalide : " + nouveauStatut);
+
+        }
+
     }
+
+
+//    @Override
+//    @Transactional
+//    public CommandeResponseDTO changerStatut(Long id, ChangeStatusCommand statut) {
+//        Commande commande = repositoryCommande.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
+//
+//        if (commande.getStatut() == StatutCommande.LIVREE) {
+//            throw new IllegalStateException("Une commande livrée ne peut plus changer de statut");
+//        }
+//
+//        if (commande.getStatut() == StatutCommande.EN_ATTENTE && statut.getStatut() != StatutCommande.LIVREE) {
+//            throw new IllegalStateException("Une commande doit être VALIDEE avant d'être LIVREE");
+//        }
+//
+//        commande.setStatut(statut.getStatut());
+//        Commande updated = repositoryCommande.save(commande);
+//        return commandeMapper.toDTO(updated);
+//    }
+
+
 
     private String genererNumeroCommande() {
         return "CMD-" + System.currentTimeMillis();

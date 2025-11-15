@@ -1,4 +1,4 @@
-package com.tricol.stock.dto;
+package com.tricol.stock.dto.response;
 
 import com.tricol.stock.enums.StatutBonSortie;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class BonSortieDTO {
+public class BonSortieResponseDTO {
     private Long id;
     private String numero;
     private LocalDateTime dateCreation;
@@ -15,5 +15,5 @@ public class BonSortieDTO {
     private StatutBonSortie statut;
     private String atelier;
     private String commentaire;
-    private List<LigneBonSortieDTO> lignes;
+    private List<LigneBonSortieResponseDTO> lignes;
 }

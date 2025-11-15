@@ -1,4 +1,4 @@
-package com.tricol.stock.dto;
+package com.tricol.stock.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

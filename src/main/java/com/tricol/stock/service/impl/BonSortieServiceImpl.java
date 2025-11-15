@@ -1,7 +1,9 @@
 package com.tricol.stock.service.impl;
 
-import com.tricol.stock.dto.BonSortieDTO;
-import com.tricol.stock.dto.LigneBonSortieDTO;
+import com.tricol.stock.dto.request.BonSortieCreateRequest;
+import com.tricol.stock.dto.request.BonSortieUpdateRequest;
+import com.tricol.stock.dto.request.LigneBonSortieCreateRequest;
+import com.tricol.stock.dto.response.BonSortieResponseDTO;
 import com.tricol.stock.entity.BonSortie;
 import com.tricol.stock.entity.LigneBonSortie;
 import com.tricol.stock.entity.MouvementStock;
@@ -34,12 +36,12 @@ public class BonSortieServiceImpl implements BonSortieService {
     private final BonSortieMapper bonSortieMapper;
     
     @Override
-    public List<BonSortieDTO> findAll() {
+    public List<BonSortieResponseDTO> findAll() {
         return bonSortieMapper.toDTOList(bonSortieRepository.findAll());
     }
     
     @Override
-    public BonSortieDTO findById(Long id) {
+    public BonSortieResponseDTO findById(Long id) {
         BonSortie bonSortie = bonSortieRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Bon de sortie non trouvé: " + id));
         return bonSortieMapper.toDTO(bonSortie);
@@ -47,7 +49,7 @@ public class BonSortieServiceImpl implements BonSortieService {
     
     @Override
     @Transactional
-    public BonSortieDTO create(BonSortieDTO dto) {
+    public BonSortieResponseDTO create(BonSortieCreateRequest dto) {
         BonSortie bonSortie = new BonSortie();
         bonSortie.setNumero(genererNumero());
         bonSortie.setDateCreation(LocalDateTime.now());
@@ -55,10 +57,10 @@ public class BonSortieServiceImpl implements BonSortieService {
         bonSortie.setAtelier(dto.getAtelier());
         bonSortie.setCommentaire(dto.getCommentaire());
         
-        for (LigneBonSortieDTO ligneDTO : dto.getLignes()) {
+        for (LigneBonSortieCreateRequest ligneDTO : dto.getLignes()) {
             Produit produit = produitRepository.findById(ligneDTO.getProduitId())
                 .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé: " + ligneDTO.getProduitId()));
-            
+
             LigneBonSortie ligne = new LigneBonSortie();
             ligne.setProduit(produit);
             ligne.setQuantite(ligneDTO.getQuantite());
@@ -73,28 +75,35 @@ public class BonSortieServiceImpl implements BonSortieService {
     
     @Override
     @Transactional
-    public BonSortieDTO update(Long id, BonSortieDTO dto) {
+    public BonSortieResponseDTO update(Long id, BonSortieUpdateRequest dto) {
         BonSortie existing = bonSortieRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Bon de sortie non trouvé: " + id));
         
         if (existing.getStatut() != StatutBonSortie.BROUILLON) {
             throw new IllegalStateException("Seuls les bons BROUILLON peuvent être modifiés");
         }
+
+        if (dto.getAtelier() != null) {
+            existing.setAtelier(dto.getAtelier());
+        }
+        if (dto.getCommentaire() != null) {
+            existing.setCommentaire(dto.getCommentaire());
+        }
         
-        existing.setAtelier(dto.getAtelier());
-        existing.setCommentaire(dto.getCommentaire());
-        existing.getLignes().clear();
-        
-        for (LigneBonSortieDTO ligneDTO : dto.getLignes()) {
-            Produit produit = produitRepository.findById(ligneDTO.getProduitId())
-                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé: " + ligneDTO.getProduitId()));
+        if (dto.getLignes() != null && !dto.getLignes().isEmpty()) {
+            existing.getLignes().clear();
             
-            LigneBonSortie ligne = new LigneBonSortie();
-            ligne.setProduit(produit);
-            ligne.setQuantite(ligneDTO.getQuantite());
-            ligne.setBonSortie(existing);
-            
-            existing.getLignes().add(ligne);
+            for (LigneBonSortieCreateRequest ligneDTO : dto.getLignes()) {
+                Produit produit = produitRepository.findById(ligneDTO.getProduitId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé: " + ligneDTO.getProduitId()));
+                
+                LigneBonSortie ligne = new LigneBonSortie();
+                ligne.setProduit(produit);
+                ligne.setQuantite(ligneDTO.getQuantite());
+                ligne.setBonSortie(existing);
+                
+                existing.getLignes().add(ligne);
+            }
         }
         
         BonSortie updated = bonSortieRepository.save(existing);
@@ -103,32 +112,29 @@ public class BonSortieServiceImpl implements BonSortieService {
     
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public BonSortieDTO valider(Long id) {
+    public BonSortieResponseDTO valider(Long id) {
         BonSortie bon = bonSortieRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Bon de sortie non trouvé: " + id));
-        
+
         if (bon.getStatut() != StatutBonSortie.BROUILLON) {
             throw new IllegalStateException("Seuls les bons BROUILLON peuvent être validés");
         }
-        
+
         for (LigneBonSortie ligne : bon.getLignes()) {
-            List<MouvementStock> mouvements = fifoStrategy.consumeStock(
-                ligne.getProduit(), 
-                ligne.getQuantite()
-            );
-            
+            List<MouvementStock> mouvements = fifoStrategy.consumeStock(ligne.getProduit(), ligne.getQuantite());
+
             mouvements.forEach(m -> m.setReference("BS-" + bon.getNumero()));
             mouvementStockRepository.saveAll(mouvements);
-            
+
             ligne.getProduit().setStockActuel(
                 ligne.getProduit().getStockActuel() - ligne.getQuantite()
             );
             produitRepository.save(ligne.getProduit());
         }
-        
+
         bon.setStatut(StatutBonSortie.VALIDE);
         bon.setDateValidation(LocalDateTime.now());
-        
+
         BonSortie validated = bonSortieRepository.save(bon);
         return bonSortieMapper.toDTO(validated);
     }
@@ -148,7 +154,7 @@ public class BonSortieServiceImpl implements BonSortieService {
     }
     
     @Override
-    public List<BonSortieDTO> findByAtelier(String atelier) {
+    public List<BonSortieResponseDTO> findByAtelier(String atelier) {
         return bonSortieMapper.toDTOList(bonSortieRepository.findByAtelier(atelier));
     }
     

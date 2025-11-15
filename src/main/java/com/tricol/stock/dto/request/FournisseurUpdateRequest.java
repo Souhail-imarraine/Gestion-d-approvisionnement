@@ -1,18 +1,17 @@
-package com.tricol.stock.dto;
+package com.tricol.stock.dto.request;
+
 import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FournisseurDTO {
+public class FournisseurUpdateRequest {
 
-    private Long id;
-    @NotBlank(message = "La raison sociale est obligatoire")
     @Size(min = 3, max = 100, message = "La raison sociale doit contenir entre 3 et 100 caractères")
     private String raisonSociale;
 
-    @Size(max = 250, message = "L'adresse ne peut pas dépasser 200 caractères")
+    @Size(max = 250, message = "L'adresse ne peut pas dépasser 250 caractères")
     private String adresse;
 
     @Size(max = 50, message = "La ville ne peut pas dépasser 50 caractères")

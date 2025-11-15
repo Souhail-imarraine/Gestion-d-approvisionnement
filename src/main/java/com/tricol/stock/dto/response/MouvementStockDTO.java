@@ -1,4 +1,4 @@
-package com.tricol.stock.dto;
+package com.tricol.stock.dto.response;
 
 import com.tricol.stock.enums.TypeMouvement;
 import lombok.*;

@@ -1,6 +1,6 @@
 package com.tricol.stock.service;
 
-import com.tricol.stock.dto.*;
+import com.tricol.stock.dto.response.*;
 
 import java.util.List;
 

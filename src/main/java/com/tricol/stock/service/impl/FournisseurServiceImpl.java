@@ -1,9 +1,12 @@
 package com.tricol.stock.service.impl;
 
-import com.tricol.stock.dto.FournisseurDTO;
+import com.tricol.stock.dto.request.FournisseurCreateRequest;
+import com.tricol.stock.dto.request.FournisseurUpdateRequest;
+import com.tricol.stock.dto.response.FournisseurResponseDTO;
 import com.tricol.stock.entity.Fournisseur;
 import com.tricol.stock.exception.ResourceNotFoundException;
 import com.tricol.stock.mapper.FournisseurMapper;
+import com.tricol.stock.repository.CommandeRepository;
 import com.tricol.stock.repository.FournisseurRepository;
 import com.tricol.stock.service.FournisseurService;
 import lombok.RequiredArgsConstructor;
@@ -19,52 +22,46 @@ public class FournisseurServiceImpl implements FournisseurService {
 
     private final FournisseurRepository repositoryFournisseur;
     private final FournisseurMapper FournisseurMapper;
+    private final CommandeRepository commandeRepository;
 
     @Override
-    public List<FournisseurDTO> findAll() {
-        return FournisseurMapper.toDTOList(repositoryFournisseur.findAll());
+    public List<FournisseurResponseDTO> findAll() {
+        return FournisseurMapper.toResponseDTOList(repositoryFournisseur.findAll());
     }
 
     @Override
-    public FournisseurDTO findById(Long id) {
+    public FournisseurResponseDTO findById(Long id) {
         Fournisseur fournisseur = repositoryFournisseur.findById(id).orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + id));
-        return FournisseurMapper.toDTO(fournisseur);
+        return FournisseurMapper.toResponseDTO(fournisseur);
     }
 
     @Override
-    public FournisseurDTO create(FournisseurDTO dto) {
+    public FournisseurResponseDTO create(FournisseurCreateRequest dto) {
         if(dto.getEmail() != null && repositoryFournisseur.existsByEmail(dto.getEmail())){
-            throw new IllegalArgumentException("l'email" + dto.getEmail() + " existe déjà ");
+            throw new IllegalArgumentException("l'email " + dto.getEmail() + " existe déjà");
         }
         if (dto.getIce() != null && repositoryFournisseur.existsByIce(dto.getIce())) {
             throw new IllegalArgumentException("Un fournisseur avec l'ICE " + dto.getIce() + " existe déjà");
         }
         Fournisseur fournisseur = FournisseurMapper.toEntity(dto);
         Fournisseur saved = repositoryFournisseur.save(fournisseur);
-        return FournisseurMapper.toDTO(saved);
+        return FournisseurMapper.toResponseDTO(saved);
     }
 
     @Override
-    public FournisseurDTO update(Long id, FournisseurDTO dto) {
+    public FournisseurResponseDTO update(Long id, FournisseurUpdateRequest dto) {
         Fournisseur existing = repositoryFournisseur.findById(id).orElseThrow(() -> new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + id));
 
-        if(dto.getEmail() != null && repositoryFournisseur.existsByEmail(dto.getEmail())){
-            throw new IllegalArgumentException("l'email" + dto.getEmail() + " existe déjà ");
+        if(dto.getEmail() != null && !dto.getEmail().equals(existing.getEmail()) && repositoryFournisseur.existsByEmail(dto.getEmail())){
+            throw new IllegalArgumentException("l'email " + dto.getEmail() + " existe déjà");
         }
-        if (dto.getIce() != null && repositoryFournisseur.existsByIce(dto.getIce())) {
+        if (dto.getIce() != null && !dto.getIce().equals(existing.getIce()) && repositoryFournisseur.existsByIce(dto.getIce())) {
             throw new IllegalArgumentException("Un fournisseur avec l'ICE " + dto.getIce() + " existe déjà");
         }
 
-        existing.setRaisonSociale(dto.getRaisonSociale());
-        existing.setAdresse(dto.getAdresse());
-        existing.setVille(dto.getVille());
-        existing.setPersonneContact(dto.getPersonneContact());
-        existing.setEmail(dto.getEmail());
-        existing.setTelephone(dto.getTelephone());
-        existing.setIce(dto.getIce());
-
+        FournisseurMapper.updateEntityFromDto(dto, existing);
         Fournisseur updated = repositoryFournisseur.save(existing);
-        return FournisseurMapper.toDTO(updated);
+        return FournisseurMapper.toResponseDTO(updated);
     }
 
     @Override
@@ -72,12 +69,16 @@ public class FournisseurServiceImpl implements FournisseurService {
         if (!repositoryFournisseur.existsById(id)) {
             throw new ResourceNotFoundException("Fournisseur non trouvé avec l'ID: " + id);
         }
+
+        if (!commandeRepository.findByFournisseurId(id).isEmpty()) {
+            throw new IllegalArgumentException("Impossible de supprimer ce fournisseur car il a des commandes associées");
+        }
         repositoryFournisseur.deleteById(id);
     }
 
     @Override
-    public List<FournisseurDTO> searchByName(String name){
+    public List<FournisseurResponseDTO> searchByName(String name){
         List<Fournisseur> fournisseurs = repositoryFournisseur.findByRaisonSocialeContainingIgnoreCase(name);
-        return FournisseurMapper.toDTOList(fournisseurs);
+        return FournisseurMapper.toResponseDTOList(fournisseurs);
     }
 }

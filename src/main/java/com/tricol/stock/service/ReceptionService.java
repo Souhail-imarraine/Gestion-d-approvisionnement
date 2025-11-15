@@ -1,7 +1,7 @@
 package com.tricol.stock.service;
 
-import com.tricol.stock.dto.CommandeDTO;
+import com.tricol.stock.dto.response.CommandeResponseDTO;
 
 public interface ReceptionService {
-    CommandeDTO receptionnerCommande(Long commandeId);
+    CommandeResponseDTO receptionnerCommande(Long commandeId);
 }

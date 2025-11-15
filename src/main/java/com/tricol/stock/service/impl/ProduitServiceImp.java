@@ -1,7 +1,9 @@
 package com.tricol.stock.service.impl;
 
-import com.tricol.stock.dto.ProduitDTO;
-import com.tricol.stock.dto.StockDTO;
+import com.tricol.stock.dto.request.ProduitCreateRequest;
+import com.tricol.stock.dto.request.ProduitUpdateRequest;
+import com.tricol.stock.dto.response.ProduitResponseDTO;
+import com.tricol.stock.dto.response.StockDTO;
 import com.tricol.stock.entity.Produit;
 import com.tricol.stock.exception.DuplicateReferenceException;
 import com.tricol.stock.exception.ResourceNotFoundException;
@@ -23,43 +25,40 @@ public class ProduitServiceImp implements ProduitService {
     private final ProduitMapper produitMapper;
     private final LigneCommandeRepository ligneCommandeRepository;
 
-    public List<ProduitDTO> findAll() {
-        return produitMapper.toDTOList(produitRepository.findAll());
+    public List<ProduitResponseDTO> findAll() {
+        return produitMapper.toResponseDTOList(produitRepository.findAll());
     }
 
     @Override
-    public ProduitDTO findById(Long id) {
+    public ProduitResponseDTO findById(Long id) {
         Produit produit = produitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + id));
-        return produitMapper.toDTO(produit);
+        return produitMapper.toResponseDTO(produit);
     }
 
     @Override
-    public ProduitDTO create(ProduitDTO dto) {
+    public ProduitResponseDTO create(ProduitCreateRequest dto) {
         if(dto.getReference() != null && produitRepository.existsByreference(dto.getReference())){
-            throw new DuplicateReferenceException("La référence" +dto.getReference()+" existe déjà");
+            throw new DuplicateReferenceException("La référence " + dto.getReference() + " existe déjà");
         }
         Produit produit = produitMapper.toEntity(dto);
+        produit.setStockActuel(0);
         Produit saved = produitRepository.save(produit);
-        return produitMapper.toDTO(saved);
+        return produitMapper.toResponseDTO(saved);
     }
 
     @Override
-    public ProduitDTO update(Long id, ProduitDTO dto) {
+    public ProduitResponseDTO update(Long id, ProduitUpdateRequest dto) {
         Produit existing = produitRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé avec l'ID: " + id));
 
-        existing.setReference(dto.getReference());
-        existing.setNom(dto.getNom());
-        existing.setDescription(dto.getDescription());
-        existing.setPrixUnitaire(dto.getPrixUnitaire());
-        existing.setCategorie(dto.getCategorie());
-        existing.setStockActuel(dto.getStockActuel());
-        existing.setPointCommande(dto.getPointCommande());
-        existing.setUniteMesure(dto.getUniteMesure());
+        if(dto.getReference() != null && !dto.getReference().equals(existing.getReference()) && produitRepository.existsByreference(dto.getReference())){
+            throw new DuplicateReferenceException("La référence " + dto.getReference() + " existe déjà");
+        }
 
+        produitMapper.updateEntityFromDto(dto, existing);
         Produit updated = produitRepository.save(existing);
-        return produitMapper.toDTO(updated);
+        return produitMapper.toResponseDTO(updated);
     }
 
     @Override
@@ -90,7 +89,7 @@ public class ProduitServiceImp implements ProduitService {
         );
     }
 
-    public List<ProduitDTO> findProduitsEnAlerte() {
-        return produitMapper.toDTOList(produitRepository.findProduitsEnAlerte());
+    public List<ProduitResponseDTO> findProduitsEnAlerte() {
+        return produitMapper.toResponseDTOList(produitRepository.findProduitsEnAlerte());
     }
 }
