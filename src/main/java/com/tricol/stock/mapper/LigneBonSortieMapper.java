@@ -1,6 +1,6 @@
 package com.tricol.stock.mapper;
 
-import com.tricol.stock.dto.LigneBonSortieDTO;
+import com.tricol.stock.dto.response.LigneBonSortieResponseDTO;
 import com.tricol.stock.entity.LigneBonSortie;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,11 +13,7 @@ public interface LigneBonSortieMapper {
     @Mapping(source = "produit.id", target = "produitId")
     @Mapping(source = "produit.nom", target = "produitNom")
     @Mapping(source = "produit.reference", target = "produitReference")
-    LigneBonSortieDTO toDTO(LigneBonSortie entity);
+    LigneBonSortieResponseDTO toDTO(LigneBonSortie entity);
     
-    @Mapping(target = "produit", ignore = true)
-    @Mapping(target = "bonSortie", ignore = true)
-    LigneBonSortie toEntity(LigneBonSortieDTO dto);
-    
-    List<LigneBonSortieDTO> toDTOList(List<LigneBonSortie> entities);
+    List<LigneBonSortieResponseDTO> toDTOList(List<LigneBonSortie> entities);
 }

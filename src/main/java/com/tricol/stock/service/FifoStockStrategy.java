@@ -30,17 +30,17 @@ public class FifoStockStrategy {
             if (remaining <= 0) break;
             
             Integer fromThisLot = Math.min(lot.getQuantiteRestante(), remaining);
-            
+
             MouvementStock mouvement = new MouvementStock();
             mouvement.setProduit(produit);
             mouvement.setLot(lot);
             mouvement.setTypeMouvement(TypeMouvement.SORTIE);
-            mouvement.setQuantite(-fromThisLot);
+            mouvement.setQuantite(fromThisLot);
             mouvement.setPrixUnitaire(lot.getPrixUnitaire());
             mouvement.setDateMouvement(LocalDate.now());
             
             mouvements.add(mouvement);
-            
+
             lot.setQuantiteRestante(lot.getQuantiteRestante() - fromThisLot);
             remaining -= fromThisLot;
         }

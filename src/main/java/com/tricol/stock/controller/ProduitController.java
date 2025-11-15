@@ -1,7 +1,9 @@
 package com.tricol.stock.controller;
 
-import com.tricol.stock.dto.StockDTO;
-import com.tricol.stock.dto.ProduitDTO;
+import com.tricol.stock.dto.request.ProduitCreateRequest;
+import com.tricol.stock.dto.request.ProduitUpdateRequest;
+import com.tricol.stock.dto.response.ProduitResponseDTO;
+import com.tricol.stock.dto.response.StockDTO;
 import com.tricol.stock.service.impl.ProduitServiceImp;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,23 +22,23 @@ public class ProduitController {
     private final ProduitServiceImp service;
 
     @GetMapping
-    public ResponseEntity<List<ProduitDTO>> getAll() {
+    public ResponseEntity<List<ProduitResponseDTO>> getAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProduitDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<ProduitResponseDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<ProduitDTO> create(@Valid @RequestBody ProduitDTO dto) {
-        ProduitDTO created = service.create(dto);
+    public ResponseEntity<ProduitResponseDTO> create(@Valid @RequestBody ProduitCreateRequest dto) {
+        ProduitResponseDTO created = service.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProduitDTO> update(@PathVariable Long id, @Valid @RequestBody ProduitDTO dto) {
+    public ResponseEntity<ProduitResponseDTO> update(@PathVariable Long id, @Valid @RequestBody ProduitUpdateRequest dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -49,7 +51,7 @@ public class ProduitController {
     }
 
     @GetMapping("/alertes")
-    public ResponseEntity<List<ProduitDTO>> getProduitsEnAlerte() {
+    public ResponseEntity<List<ProduitResponseDTO>> getProduitsEnAlerte() {
         return ResponseEntity.ok(service.findProduitsEnAlerte());
     }
 

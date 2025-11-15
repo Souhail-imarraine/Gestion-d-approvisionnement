@@ -1,17 +1,24 @@
 package com.tricol.stock.mapper;
 
-import com.tricol.stock.dto.FournisseurDTO;
+import com.tricol.stock.dto.request.FournisseurCreateRequest;
+import com.tricol.stock.dto.request.FournisseurUpdateRequest;
+import com.tricol.stock.dto.response.FournisseurResponseDTO;
 import com.tricol.stock.entity.Fournisseur;
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface FournisseurMapper {
 
-    FournisseurDTO toDTO(Fournisseur entity);
+    FournisseurResponseDTO toResponseDTO(Fournisseur entity);
 
-    Fournisseur toEntity(FournisseurDTO dto);
+    @Mapping(target = "id", ignore = true)
+    Fournisseur toEntity(FournisseurCreateRequest dto);
 
-    List<FournisseurDTO> toDTOList(List<Fournisseur> entities);
+    @Mapping(target = "id", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntityFromDto(FournisseurUpdateRequest dto, @MappingTarget Fournisseur entity);
+
+    List<FournisseurResponseDTO> toResponseDTOList(List<Fournisseur> entities);
 }

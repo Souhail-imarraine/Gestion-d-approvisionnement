@@ -1,22 +1,24 @@
 package com.tricol.stock.service;
 
-import com.tricol.stock.dto.BonSortieDTO;
+import com.tricol.stock.dto.request.BonSortieCreateRequest;
+import com.tricol.stock.dto.request.BonSortieUpdateRequest;
+import com.tricol.stock.dto.response.BonSortieResponseDTO;
 
 import java.util.List;
 
 public interface BonSortieService {
     
-    List<BonSortieDTO> findAll();
+    List<BonSortieResponseDTO> findAll();
     
-    BonSortieDTO findById(Long id);
+    BonSortieResponseDTO findById(Long id);
     
-    BonSortieDTO create(BonSortieDTO dto);
+    BonSortieResponseDTO create(BonSortieCreateRequest dto);
     
-    BonSortieDTO update(Long id, BonSortieDTO dto);
+    BonSortieResponseDTO update(Long id, BonSortieUpdateRequest dto);
     
-    BonSortieDTO valider(Long id);
+    BonSortieResponseDTO valider(Long id);
     
     void annuler(Long id);
     
-    List<BonSortieDTO> findByAtelier(String atelier);
+    List<BonSortieResponseDTO> findByAtelier(String atelier);
 }

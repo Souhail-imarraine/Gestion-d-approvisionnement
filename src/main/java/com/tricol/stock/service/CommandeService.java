@@ -1,17 +1,20 @@
 package com.tricol.stock.service;
 
-import com.tricol.stock.dto.CommandeDTO;
+import com.tricol.stock.dto.request.CommandeCreateRequest;
+import com.tricol.stock.dto.request.CommandeUpdateRequest;
+import com.tricol.stock.dto.response.CommandeResponseDTO;
 import com.tricol.stock.enums.StatutCommande;
 
 import java.util.List;
 
 public interface CommandeService {
-    CommandeDTO create(CommandeDTO dto);
-    CommandeDTO update(Long id, CommandeDTO dto);
-    CommandeDTO findById(Long id);
-    List<CommandeDTO> findAll();
+    CommandeResponseDTO create(CommandeCreateRequest dto);
+    CommandeResponseDTO update(Long id, CommandeUpdateRequest dto);
+    CommandeResponseDTO findById(Long id);
+    List<CommandeResponseDTO> findAll();
     void delete(Long id);
-    List<CommandeDTO> findByStatut(StatutCommande statut);
-    List<CommandeDTO> findByFournisseur(Long fournisseurId);
-    CommandeDTO changerStatut(Long id, StatutCommande nouveauStatut);
+    List<CommandeResponseDTO> findByStatut(StatutCommande statut);
+    List<CommandeResponseDTO> findByFournisseur(Long fournisseurId);
+    CommandeResponseDTO changerStatut(Long id, String nouveauStatut);
+//    CommandeResponseDTO  changerStatut(Long id, ChangeStatusCommand statut);
 }

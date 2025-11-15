@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class LigneCommande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

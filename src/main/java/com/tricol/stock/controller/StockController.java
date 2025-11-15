@@ -1,6 +1,6 @@
 package com.tricol.stock.controller;
 
-import com.tricol.stock.dto.*;
+import com.tricol.stock.dto.response.*;
 import com.tricol.stock.service.StockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
