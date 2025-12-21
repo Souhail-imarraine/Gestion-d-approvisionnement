@@ -11,4 +11,5 @@ public interface StockService {
     List<MouvementStockDTO> getMouvementsProduit(Long produitId);
     List<EtatStockDTO> getProduitsEnAlerte();
     ValorisationStockDTO getValorisationStock();
+//    MouvementStockDTO searchingMouvement();
 }

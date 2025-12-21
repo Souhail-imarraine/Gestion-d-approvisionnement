@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,32 +22,38 @@ public class BonSortieController {
     private final BonSortieService bonSortieService;
     
     @GetMapping
+    @PreAuthorize("hasAuthority('READ_BON_SORTIE')")
     public ResponseEntity<List<BonSortieResponseDTO>> findAll() {
         return ResponseEntity.ok(bonSortieService.findAll());
     }
     
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('READ_BON_SORTIE')")
     public ResponseEntity<BonSortieResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(bonSortieService.findById(id));
     }
     
     @PostMapping
+    @PreAuthorize("hasAuthority('CREATE_BON_SORTIE')")
     public ResponseEntity<BonSortieResponseDTO> create(@Valid @RequestBody BonSortieCreateRequest dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(bonSortieService.create(dto));
     }
     
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('UPDATE_BON_SORTIE')")
     public ResponseEntity<BonSortieResponseDTO> update(@PathVariable Long id, @Valid @RequestBody BonSortieUpdateRequest dto) {
         return ResponseEntity.ok(bonSortieService.update(id, dto));
     }
     
     @PutMapping("/{id}/valider")
+    @PreAuthorize("hasAuthority('UPDATE_BON_SORTIE')")
     public ResponseEntity<BonSortieResponseDTO> valider(@PathVariable Long id) {
         return ResponseEntity.ok(bonSortieService.valider(id));
     }
     
     @PutMapping("/{id}/annuler")
+    @PreAuthorize("hasAuthority('DELETE_BON_SORTIE')")
     public ResponseEntity<HashMap<String, String>> annuler(@PathVariable Long id) {
         bonSortieService.annuler(id);
         HashMap<String, String> response = new HashMap<>();
@@ -55,6 +62,7 @@ public class BonSortieController {
     }
     
     @GetMapping("/atelier/{atelier}")
+    @PreAuthorize("hasAuthority('READ_BON_SORTIE')")
     public ResponseEntity<List<BonSortieResponseDTO>> findByAtelier(@PathVariable String atelier) {
         return ResponseEntity.ok(bonSortieService.findByAtelier(atelier));
     }

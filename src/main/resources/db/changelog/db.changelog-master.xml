@@ -12,5 +12,14 @@
     <include file="/db/changelog/005-create-lots-stock.xml"/>
     <include file="/db/changelog/006-create-mouvements-stock.xml"/>
     <include file="/db/changelog/007-create-bons-sortie.xml"/>
+    <include file="/db/changelog/008-create-users.xml"/>
+    <include file="/db/changelog/009-create-roles.xml"/>
+    <include file="/db/changelog/010-create-permissions.xml"/>
+    <include file="/db/changelog/011-create-user-roles.xml"/>
+    <include file="/db/changelog/012-create-role-permissions.xml"/>
+    <include file="/db/changelog/013-create-user-permissions.xml"/>
+    <include file="/db/changelog/014-create-refresh-tokens.xml"/>
+    <include file="/db/changelog/015-create-audit-logs.xml"/>
+    <include file="/db/changelog/016-insert-roles-permissions.xml"/>
 
 </databaseChangeLog>

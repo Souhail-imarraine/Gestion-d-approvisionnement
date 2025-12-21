@@ -13,6 +13,7 @@ public interface CommandeMapper {
     @Mapping(source = "fournisseur.raisonSociale", target = "fournisseurNom")
     @Mapping(source = "lignes", target = "lignes")
     CommandeResponseDTO toDTO(Commande entity);
-    
+
     List<CommandeResponseDTO> toDTOList(List<Commande> entities);
+
 }

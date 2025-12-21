@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -21,27 +22,32 @@ public class FournisseurController {
     private final FournisseurService FournisseurService;
 
     @GetMapping
+    @PreAuthorize("hasAuthority('READ_FOURNISSEUR')")
     public ResponseEntity<List<FournisseurResponseDTO>> getAll() {
         return ResponseEntity.ok(FournisseurService.findAll());
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('READ_FOURNISSEUR')")
     public ResponseEntity<List<FournisseurResponseDTO>> searchByName(@RequestParam String name){
         return ResponseEntity.ok(FournisseurService.searchByName(name));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('READ_FOURNISSEUR')")
     public ResponseEntity<FournisseurResponseDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(FournisseurService.findById(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CREATE_FOURNISSEUR')")
     public ResponseEntity<FournisseurResponseDTO> create(@Valid @RequestBody FournisseurCreateRequest dto) {
         FournisseurResponseDTO created = FournisseurService.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('UPDATE_FOURNISSEUR')")
     public ResponseEntity<FournisseurResponseDTO> update(
             @PathVariable Long id,
             @Valid @RequestBody FournisseurUpdateRequest dto) {
@@ -49,6 +55,7 @@ public class FournisseurController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('DELETE_FOURNISSEUR')")
     public ResponseEntity<HashMap<String, String>> delete(@PathVariable Long id) {
         FournisseurService.delete(id);
         HashMap<String, String> response  = new HashMap<>();
