@@ -80,15 +80,24 @@ class AuthServiceTest {
 
     @Test
     void testRegister_Success() {
+        UserApp savedUser = UserApp.builder()
+                .id(1L)
+                .username("newuser")
+                .email("newuser@tricol.com")
+                .password("encodedPassword")
+                .enabled(false)
+                .build();
+
         when(userRepository.existsByUsername(anyString())).thenReturn(false);
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(userRepository.save(any(UserApp.class))).thenReturn(testUser);
+        when(userRepository.save(any(UserApp.class))).thenReturn(savedUser);
 
         AuthResponse response = authService.register(registerRequest);
 
         assertNotNull(response);
-        assertEquals("testuser", response.getUsername());
+        assertEquals("newuser", response.getUsername());
+        assertEquals("newuser@tricol.com", response.getEmail());
         verify(userRepository, times(1)).save(any(UserApp.class));
     }
 
