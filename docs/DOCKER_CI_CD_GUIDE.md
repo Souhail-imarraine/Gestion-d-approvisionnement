@@ -98,6 +98,7 @@ docker run -d \
 ### 🐳 Docker Compose (Recommandé)
 
 Créer `docker-compose.yml`:
+
 ```yaml
 version: '3.8'
 
@@ -116,7 +117,7 @@ services:
       - tricol-network
 
   app:
-    build: .
+    build: ..
     container_name: tricol-stock
     ports:
       - "8081:8081"
