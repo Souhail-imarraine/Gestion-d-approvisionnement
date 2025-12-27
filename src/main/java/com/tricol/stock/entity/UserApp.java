@@ -27,7 +27,7 @@ public class UserApp implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
     
-    @Column(nullable = false)
+    @Column(nullable = true)  // Changed: Now nullable for Keycloak users
     private String password;
     
     private String firstName;
@@ -36,6 +36,14 @@ public class UserApp implements UserDetails {
     @Column(nullable = false)
     private boolean enabled = false;
     
+    /**
+     * Keycloak User ID - Links this user to their Keycloak account
+     * When null, user authenticates locally (legacy mode)
+     * When set, user authenticates via Keycloak (recommended)
+     */
+    @Column(name = "keycloak_user_id", unique = true)
+    private String keycloakUserId;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
@@ -61,6 +69,14 @@ public class UserApp implements UserDetails {
         updatedAt = LocalDateTime.now();
     }
     
+    /**
+     * Check if this user is linked to Keycloak
+     * @return true if user authenticates via Keycloak, false if local auth
+     */
+    public boolean isKeycloakUser() {
+        return keycloakUserId != null && !keycloakUserId.isEmpty();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();

@@ -123,12 +123,12 @@ services:
     networks:
       - tricol-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       timeout: 20s
       retries: 10
 
   app:
-    build: .
+    build: ..
     container_name: tricol-stock
     ports:
       - "8081:8081"

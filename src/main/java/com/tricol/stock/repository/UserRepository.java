@@ -16,4 +16,18 @@ public interface UserRepository extends JpaRepository<UserApp, Long> {
     boolean existsByUsername(String username);
     
     boolean existsByEmail(String email);
+    
+    /**
+     * Find user by their Keycloak User ID
+     * @param keycloakUserId The Keycloak user identifier
+     * @return Optional containing the user if found
+     */
+    Optional<UserApp> findByKeycloakUserId(String keycloakUserId);
+    
+    /**
+     * Check if a Keycloak user ID already exists
+     * @param keycloakUserId The Keycloak user identifier
+     * @return true if exists, false otherwise
+     */
+    boolean existsByKeycloakUserId(String keycloakUserId);
 }

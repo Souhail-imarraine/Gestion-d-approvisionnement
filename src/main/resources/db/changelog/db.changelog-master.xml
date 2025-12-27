@@ -21,5 +21,6 @@
     <include file="/db/changelog/014-create-refresh-tokens.xml"/>
     <include file="/db/changelog/015-create-audit-logs.xml"/>
     <include file="/db/changelog/016-insert-roles-permissions.xml"/>
+    <include file="/db/changelog/017-add-keycloak-integration.xml"/>
 
 </databaseChangeLog>

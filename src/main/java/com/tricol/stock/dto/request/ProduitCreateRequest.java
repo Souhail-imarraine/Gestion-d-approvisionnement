@@ -27,6 +27,7 @@ public class ProduitCreateRequest {
     @Size(max = 50, message = "La catégorie ne peut pas dépasser 50 caractères")
     private String categorie;
 
+    @NonNull
     @Min(value = 0, message = "Le point de commande ne peut pas être négatif")
     private Integer pointCommande;
 

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="017-add-keycloak-integration" author="tricol">
+        <comment>Add Keycloak integration: Add keycloak_user_id column for linking users to Keycloak</comment>
+
+        <!-- Add keycloak_user_id column -->
+        <addColumn tableName="users">
+            <column name="keycloak_user_id" type="VARCHAR(255)">
+                <constraints nullable="true" unique="true"/>
+            </column>
+        </addColumn>
+
+        <!-- Add index for faster lookups -->
+        <createIndex indexName="idx_keycloak_user_id" tableName="users">
+            <column name="keycloak_user_id"/>
+        </createIndex>
+
+        <!-- Make password nullable since Keycloak will handle authentication -->
+        <dropNotNullConstraint tableName="users" columnName="password" columnDataType="VARCHAR(255)"/>
+
+        <!-- Add comment to clarify that password is now optional -->
+        <sql>
+            ALTER TABLE users MODIFY COLUMN password VARCHAR(255)
+            COMMENT 'Password - Only used for local auth, NULL when using Keycloak';
+        </sql>
+
+        <rollback>
+            <dropIndex indexName="idx_keycloak_user_id" tableName="users"/>
+            <dropColumn tableName="users" columnName="keycloak_user_id"/>
+            <addNotNullConstraint tableName="users" columnName="password" columnDataType="VARCHAR(255)"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
+

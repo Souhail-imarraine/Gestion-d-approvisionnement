@@ -41,6 +41,7 @@ public class ProduitServiceImp implements ProduitService {
         if(dto.getReference() != null && produitRepository.existsByreference(dto.getReference())){
             throw new DuplicateReferenceException("La référence " + dto.getReference() + " existe déjà");
         }
+
         Produit produit = produitMapper.toEntity(dto);
         produit.setStockActuel(0);
         Produit saved = produitRepository.save(produit);
