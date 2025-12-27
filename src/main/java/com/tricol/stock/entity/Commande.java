@@ -44,4 +44,11 @@ public class Commande {
     
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LigneCommande> lignes = new ArrayList<>();
+
+    @PrePersist
+    public void onCreate(){
+        if (this.dateCommande == null){
+            this.dateCommande = LocalDate.now();
+        }
+    }
 }

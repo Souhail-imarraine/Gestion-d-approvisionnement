@@ -1,14 +1,13 @@
-package com.tricol.stock.dto;
+package com.tricol.stock.dto.request;
 
 import jakarta.validation.constraints.*;
 import lombok.*;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProduitDTO {
-
-    private Long id;
+public class ProduitCreateRequest {
 
     @NotBlank(message = "La référence est obligatoire")
     @Size(max = 50, message = "La référence ne peut pas dépasser 50 caractères")
@@ -20,19 +19,14 @@ public class ProduitDTO {
 
     @Size(max = 500, message = "La description ne peut pas dépasser 500 caractères")
     private String description;
-    
+
     @NotNull(message = "Le prix unitaire est obligatoire")
     @DecimalMin(value = "0.01", message = "Le prix doit être supérieur à 0")
-    private Double prixUnitaire;
-    
+    private BigDecimal prixUnitaire;
+
     @Size(max = 50, message = "La catégorie ne peut pas dépasser 50 caractères")
     private String categorie;
-    
-    @NotNull(message = "Le stock actuel est obligatoire")
-    @Min(value = 0, message = "Le stock ne peut pas être négatif")
-    private Integer stockActuel;
-    
-    @NotNull(message = "Le point de commande est obligatoire")
+
     @Min(value = 0, message = "Le point de commande ne peut pas être négatif")
     private Integer pointCommande;
 

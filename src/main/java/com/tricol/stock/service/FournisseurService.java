@@ -1,19 +1,22 @@
 package com.tricol.stock.service;
-import com.tricol.stock.dto.FournisseurDTO;
+
+import com.tricol.stock.dto.request.FournisseurCreateRequest;
+import com.tricol.stock.dto.request.FournisseurUpdateRequest;
+import com.tricol.stock.dto.response.FournisseurResponseDTO;
 
 import java.util.List;
 
 public interface FournisseurService {
 
-    FournisseurDTO create(FournisseurDTO dto);
+    FournisseurResponseDTO create(FournisseurCreateRequest dto);
 
-    FournisseurDTO update(Long id, FournisseurDTO dto);
+    FournisseurResponseDTO update(Long id, FournisseurUpdateRequest dto);
 
-    FournisseurDTO findById(Long id);
+    FournisseurResponseDTO findById(Long id);
 
-    List<FournisseurDTO> findAll();
+    List<FournisseurResponseDTO> findAll();
 
     void delete(Long id);
 
-    List<FournisseurDTO> searchByName(String name);
+    List<FournisseurResponseDTO> searchByName(String name);
 }

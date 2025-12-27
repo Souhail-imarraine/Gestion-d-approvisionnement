@@ -1,17 +1,26 @@
 package com.tricol.stock.mapper;
 
-import com.tricol.stock.dto.ProduitDTO;
+import com.tricol.stock.dto.request.ProduitCreateRequest;
+import com.tricol.stock.dto.request.ProduitUpdateRequest;
+import com.tricol.stock.dto.response.ProduitResponseDTO;
 import com.tricol.stock.entity.Produit;
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ProduitMapper {
     
-    ProduitDTO toDTO(Produit entity);
+    ProduitResponseDTO toResponseDTO(Produit entity);
     
-    Produit toEntity(ProduitDTO dto);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "stockActuel", ignore = true)
+    Produit toEntity(ProduitCreateRequest dto);
     
-    List<ProduitDTO> toDTOList(List<Produit> entities);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "stockActuel", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntityFromDto(ProduitUpdateRequest dto, @MappingTarget Produit entity);
+    
+    List<ProduitResponseDTO> toResponseDTOList(List<Produit> entities);
 }

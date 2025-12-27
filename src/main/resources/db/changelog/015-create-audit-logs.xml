@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="015-create-audit-logs" author="tricol">
+        <createTable tableName="audit_logs">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="action" type="VARCHAR(100)"/>
+            <column name="resource" type="VARCHAR(100)"/>
+            <column name="resource_id" type="VARCHAR(100)"/>
+            <column name="old_value" type="TEXT"/>
+            <column name="new_value" type="TEXT"/>
+            <column name="ip_address" type="VARCHAR(50)"/>
+            <column name="timestamp" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="audit_logs" baseColumnNames="user_id"
+                                 constraintName="fk_audit_logs_user"
+                                 referencedTableName="users" referencedColumnNames="id"
+                                 onDelete="SET NULL"/>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!-- Insert Roles -->
+    <changeSet id="016-1" author="tricol">
+        <insert tableName="roles">
+            <column name="name" value="ADMIN"/>
+            <column name="description" value="Administrateur système"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="name" value="RESPONSABLE_ACHATS"/>
+            <column name="description" value="Responsable des achats"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="name" value="MAGASINIER"/>
+            <column name="description" value="Magasinier"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="name" value="CHEF_ATELIER"/>
+            <column name="description" value="Chef d'atelier"/>
+        </insert>
+    </changeSet>
+
+    <!-- Insert Permissions -->
+    <changeSet id="016-2" author="tricol">
+        <!-- Fournisseurs -->
+        <insert tableName="permissions">
+            <column name="name" value="CREATE_FOURNISSEUR"/>
+            <column name="resource" value="FOURNISSEUR"/>
+            <column name="action" value="CREATE"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="READ_FOURNISSEUR"/>
+            <column name="resource" value="FOURNISSEUR"/>
+            <column name="action" value="READ"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="UPDATE_FOURNISSEUR"/>
+            <column name="resource" value="FOURNISSEUR"/>
+            <column name="action" value="UPDATE"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="DELETE_FOURNISSEUR"/>
+            <column name="resource" value="FOURNISSEUR"/>
+            <column name="action" value="DELETE"/>
+        </insert>
+
+        <!-- Produits -->
+        <insert tableName="permissions">
+            <column name="name" value="CREATE_PRODUIT"/>
+            <column name="resource" value="PRODUIT"/>
+            <column name="action" value="CREATE"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="READ_PRODUIT"/>
+            <column name="resource" value="PRODUIT"/>
+            <column name="action" value="READ"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="UPDATE_PRODUIT"/>
+            <column name="resource" value="PRODUIT"/>
+            <column name="action" value="UPDATE"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="DELETE_PRODUIT"/>
+            <column name="resource" value="PRODUIT"/>
+            <column name="action" value="DELETE"/>
+        </insert>
+
+        <!-- Commandes -->
+        <insert tableName="permissions">
+            <column name="name" value="CREATE_COMMANDE"/>
+            <column name="resource" value="COMMANDE"/>
+            <column name="action" value="CREATE"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="READ_COMMANDE"/>
+            <column name="resource" value="COMMANDE"/>
+            <column name="action" value="READ"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="UPDATE_COMMANDE"/>
+            <column name="resource" value="COMMANDE"/>
+            <column name="action" value="UPDATE"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="DELETE_COMMANDE"/>
+            <column name="resource" value="COMMANDE"/>
+            <column name="action" value="DELETE"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="RECEPTION_COMMANDE"/>
+            <column name="resource" value="COMMANDE"/>
+            <column name="action" value="RECEPTION"/>
+        </insert>
+
+        <!-- Stock -->
+        <insert tableName="permissions">
+            <column name="name" value="READ_STOCK"/>
+            <column name="resource" value="STOCK"/>
+            <column name="action" value="READ"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="UPDATE_STOCK"/>
+            <column name="resource" value="STOCK"/>
+            <column name="action" value="UPDATE"/>
+        </insert>
+
+        <!-- Bons de sortie -->
+        <insert tableName="permissions">
+            <column name="name" value="CREATE_BON_SORTIE"/>
+            <column name="resource" value="BON_SORTIE"/>
+            <column name="action" value="CREATE"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="READ_BON_SORTIE"/>
+            <column name="resource" value="BON_SORTIE"/>
+            <column name="action" value="READ"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="UPDATE_BON_SORTIE"/>
+            <column name="resource" value="BON_SORTIE"/>
+            <column name="action" value="UPDATE"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="DELETE_BON_SORTIE"/>
+            <column name="resource" value="BON_SORTIE"/>
+            <column name="action" value="DELETE"/>
+        </insert>
+    </changeSet>
+
+    <!-- Assign Permissions to ADMIN -->
+    <changeSet id="016-3" author="tricol">
+        <sql>
+            INSERT INTO role_permissions (role_id, permission_id)
+            SELECT r.id, p.id
+            FROM roles r, permissions p
+            WHERE r.name = 'ADMIN';
+        </sql>
+    </changeSet>
+
+    <!-- Assign Permissions to RESPONSABLE_ACHATS -->
+    <changeSet id="016-4" author="tricol">
+        <sql>
+            INSERT INTO role_permissions (role_id, permission_id)
+            SELECT r.id, p.id
+            FROM roles r, permissions p
+            WHERE r.name = 'RESPONSABLE_ACHATS'
+            AND p.name IN (
+                'CREATE_FOURNISSEUR', 'READ_FOURNISSEUR', 'UPDATE_FOURNISSEUR',
+                'CREATE_PRODUIT', 'READ_PRODUIT', 'UPDATE_PRODUIT',
+                'CREATE_COMMANDE', 'READ_COMMANDE', 'UPDATE_COMMANDE',
+                'READ_STOCK', 'READ_BON_SORTIE'
+            );
+        </sql>
+    </changeSet>
+
+    <!-- Assign Permissions to MAGASINIER -->
+    <changeSet id="016-5" author="tricol">
+        <sql>
+            INSERT INTO role_permissions (role_id, permission_id)
+            SELECT r.id, p.id
+            FROM roles r, permissions p
+            WHERE r.name = 'MAGASINIER'
+            AND p.name IN (
+                'READ_FOURNISSEUR', 'READ_PRODUIT',
+                'READ_COMMANDE', 'RECEPTION_COMMANDE',
+                'READ_STOCK', 'UPDATE_STOCK',
+                'CREATE_BON_SORTIE', 'READ_BON_SORTIE'
+            );
+        </sql>
+    </changeSet>
+
+    <!-- Assign Permissions to CHEF_ATELIER -->
+    <changeSet id="016-6" author="tricol">
+        <sql>
+            INSERT INTO role_permissions (role_id, permission_id)
+            SELECT r.id, p.id
+            FROM roles r, permissions p
+            WHERE r.name = 'CHEF_ATELIER'
+            AND p.name IN (
+                'READ_PRODUIT', 'READ_STOCK',
+                'CREATE_BON_SORTIE', 'READ_BON_SORTIE'
+            );
+        </sql>
+    </changeSet>
+
+    <!-- Create Admin User -->
+    <changeSet id="016-7" author="tricol">
+        <insert tableName="users">
+            <column name="username" value="admin"/>
+            <column name="email" value="admin@tricol.com"/>
+            <column name="password" value="$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy"/>
+            <column name="first_name" value="Admin"/>
+            <column name="last_name" value="Tricol"/>
+            <column name="enabled" valueBoolean="true"/>
+        </insert>
+        <sql>
+            INSERT INTO user_roles (user_id, role_id)
+            SELECT u.id, r.id
+            FROM users u, roles r
+            WHERE u.username = 'admin' AND r.name = 'ADMIN';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

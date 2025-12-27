@@ -11,7 +11,9 @@ import java.util.Optional;
 public interface FournisseurRepository extends JpaRepository<Fournisseur, Long> {
 
     Optional<Fournisseur> findByIce(String ice);
-
+    boolean existsByIce(String ice);
     List<Fournisseur> findByVille(String ville);
+    boolean existsByEmail (String email);
+    boolean existsById(Long id);
     List<Fournisseur> findByRaisonSocialeContainingIgnoreCase(String nom);
 }
